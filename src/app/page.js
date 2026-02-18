@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useState, useEffect, useRef, useLayoutEffect, useCallback, useMemo } from 'react';
-import { FaceSmileIcon, FaceFrownIcon, BoltIcon, MoonIcon, HeartIcon, HeadphonesIcon } from '@heroicons/react/24/solid';
+import { FaceSmileIcon, FaceFrownIcon, BoltIcon, MoonIcon, HeartIcon, MusicalNoteIcon } from '@heroicons/react/24/solid';
 import { PlusIcon } from '@heroicons/react/24/outline'; // If using Heroicons, otherwise use an inline SVG or emoji
 import ReactDOM from 'react-dom';
 import { useDropdown } from './dropdown-context';
@@ -405,7 +405,7 @@ export default function Home() {
     energetic: BoltIcon,
     calm: MoonIcon,
     romantic: HeartIcon,
-    glamorous: HeadphonesIcon,
+    glamorous: MusicalNoteIcon,
   };
 
   // Update moodBgColors to use vibrant mood colors
