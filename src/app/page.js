@@ -245,7 +245,7 @@ export default function Home() {
   useEffect(() => {
     Promise.all(
       moodIds.map(id =>
-        fetch(`http://localhost:5000/api/songs/${id}`).then(res => res.json())
+        fetch(`https://mood-backend-yb8i.onrender.com/api/songs/${id}`).then(res => res.json())
       )
     ).then(results => {
       const allSongs = results.flat();
@@ -263,7 +263,7 @@ export default function Home() {
 
   const fetchUserProfile = async (token) => {
     try {
-      const response = await fetch('http://localhost:5000/api/profile', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/profile', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -294,7 +294,7 @@ export default function Home() {
       const endpoint = isLoginMode ? '/api/login' : '/api/signup';
       let res;
       try {
-        res = await fetch(`http://localhost:5000${endpoint}`, {
+        res = await fetch(`https://mood-backend-yb8i.onrender.com${endpoint}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(authFormData),
