@@ -425,7 +425,7 @@ export default function Home() {
     setSongsLoading(true);
     setCurrentPage('home'); // Close playlist if open
     setSelectedPlaylistId(null); // Deselect playlist
-    fetch(`http://localhost:5000/api/songs/${mood.id}`)
+    fetch(`https://mood-backend-yb8i.onrender.com/api/songs/${mood.id}`)
       .then((res) => {
         if (!res.ok) throw new Error("Failed to fetch songs");
         return res.json();
@@ -454,7 +454,7 @@ export default function Home() {
     const fetchRecentlyPlayed = async () => {
       const token = localStorage.getItem('authToken');
       if (!token) return setRecentlyPlayed([]);
-      const res = await fetch('http://localhost:5000/api/recently-played', {
+      const res = await fetch('https://mood-backend-yb8i.onrender.com/api/recently-played', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -475,7 +475,7 @@ export default function Home() {
       return;
     }
     try {
-      const resp = await fetch('http://localhost:5000/api/recently-played', {
+      const resp = await fetch('https://mood-backend-yb8i.onrender.com/api/recently-played', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ song_id: song.id })
@@ -485,7 +485,7 @@ export default function Home() {
         console.error('Failed to add to recently played:', await resp.text());
       }
       // Refresh recently played
-      const res = await fetch('http://localhost:5000/api/recently-played', {
+      const res = await fetch('https://mood-backend-yb8i.onrender.com/api/recently-played', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) {
@@ -607,7 +607,7 @@ export default function Home() {
     setCurrentPage('mood'); // <-- Now it's 'mood'
     setSelectedPlaylistId(null); // Deselect playlist
     try {
-      const res = await fetch(`http://localhost:5000/api/songs/${mood.id}`);
+      const res = await fetch(`https://mood-backend-yb8i.onrender.com/api/songs/${mood.id}`);
       if (!res.ok) throw new Error('Failed to fetch songs');
       const moodSongs = await res.json();
       setSongs(moodSongs);
@@ -802,7 +802,7 @@ export default function Home() {
 
 
   // --- API helpers ---
-  const API_BASE = 'http://localhost:5000/api';
+  const API_BASE = 'https://mood-backend-yb8i.onrender.com/api';
   const getAuthHeaders = () => ({
     'Content-Type': 'application/json',
     'Authorization': `Bearer ${localStorage.getItem('authToken')}`
@@ -909,7 +909,7 @@ export default function Home() {
 
   // --- Fetch all songs from backend DB for adding to playlists ---
   useEffect(() => {
-    fetch('http://localhost:5000/api/songs')
+    fetch('https://mood-backend-yb8i.onrender.com/api/songs')
       .then(res => res.json())
       .then(setAllBackendSongs)
       .catch(() => setAllBackendSongs([]));
@@ -1832,7 +1832,7 @@ export default function Home() {
   const fetchSmartShuffleQueue = async () => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:5000/api/smart-shuffle/queue', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/smart-shuffle/queue', {
         headers: getAuthHeaders()
       });
       if (response.ok) {
@@ -1852,7 +1852,7 @@ export default function Home() {
   const fetchSmartShuffleHistory = async () => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:5000/api/smart-shuffle/history', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/smart-shuffle/history', {
         headers: getAuthHeaders()
       });
       if (response.ok) {
@@ -1867,7 +1867,7 @@ export default function Home() {
   const addToSmartShuffleAPI = async (song) => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:5000/api/smart-shuffle/queue', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/smart-shuffle/queue', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ song_id: song.id })
@@ -1894,7 +1894,7 @@ export default function Home() {
   const removeFromSmartShuffleAPI = async (songId) => {
     if (!user) return;
     try {
-      const response = await fetch(`http://localhost:5000/api/smart-shuffle/queue/${songId}`, {
+      const response = await fetch(`https://mood-backend-yb8i.onrender.com/api/smart-shuffle/queue/${songId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -1914,7 +1914,7 @@ export default function Home() {
   const clearSmartShuffleQueueAPI = async () => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:5000/api/smart-shuffle/queue', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/smart-shuffle/queue', {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -1932,7 +1932,7 @@ export default function Home() {
   const addToSmartShuffleHistoryAPI = async (song) => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:5000/api/smart-shuffle/history', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/smart-shuffle/history', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ song_id: song.id })
@@ -1950,7 +1950,7 @@ export default function Home() {
   const upgradeToPremium = async () => {
     if (!user) return;
     try {
-      const response = await fetch('http://localhost:5000/api/premium/upgrade', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/premium/upgrade', {
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -2061,7 +2061,7 @@ export default function Home() {
     }
     // For logged-in users, only update state after backend confirms
     try {
-      const response = await fetch('http://localhost:5000/api/smart-shuffle/queue', {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/smart-shuffle/queue', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({ song_id: song.id })
@@ -2329,7 +2329,7 @@ export default function Home() {
     setContactError('');
     setContactSuccess('');
     try {
-      const res = await fetch('http://localhost:5000/api/contact', {
+      const res = await fetch('https://mood-backend-yb8i.onrender.com/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(contactForm),
