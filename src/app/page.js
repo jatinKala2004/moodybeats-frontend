@@ -1965,6 +1965,26 @@ export default function Home() {
     }
   };
 
+  const cancelPremium = async () => {
+    if (!user) {
+      setIsLoginMode(true);
+      setShowAuthModal(true);
+      return;
+    }
+    try {
+      const response = await fetch('https://mood-backend-yb8i.onrender.com/api/premium/cancel', {
+        method: 'POST',
+        headers: getAuthHeaders()
+      });
+      if (response.ok) {
+        setShowPremiumModal(false);
+        await fetchUserProfile(localStorage.getItem('authToken'));
+      }
+    } catch (error) {
+      console.error('Error cancelling premium subscription:', error);
+    }
+  };
+
   // Smart Shuffle Functions
   const toggleSmartShuffle = () => {
     const newSmartShuffleMode = !smartShuffleMode;
@@ -2267,10 +2287,12 @@ export default function Home() {
   // Add at the top of Home component state:
   const [showMobileLibrary, setShowMobileLibrary] = useState(false);
 
-  // Add this function inside the Home component, before the return:
+  // Create Playlist button handler (works from anywhere, opens auth if not logged in)
   function handleCreatePlaylistClick() {
     if (!user) {
-      showCreatePlaylistWarning('Please login first.');
+      setIsLoginMode(true);
+      setShowAuthModal(true);
+      setCreatePlaylistWarning('');
     } else {
       setShowCreateModal(true);
       setCreatePlaylistWarning('');
@@ -2758,18 +2780,14 @@ export default function Home() {
             position: 'relative',
             flex: '1 1 0%',
             minWidth: 0,
-            background: currentPage === 'library' ? '#181818' : (selectedMood ? (moodHeroGradients?.[selectedMood.id] || heroBgByMood?.[selectedMood.id] || 'transparent') : 'transparent'),
+            background: currentPage === 'library'
+              ? '#050509'
+              : selectedMood
+                ? (moodHeroGradients?.[selectedMood.id] || heroBgByMood?.[selectedMood.id] || '#020617')
+                : 'radial-gradient(circle at 20% 0%, #1f2937 0%, #020617 35%, #000000 100%)',
           }}
         >
-          {/* Aurora and watermark only in main content area, only when no mood is selected */}
-          {!selectedMood && <div className="aurora-bg-premium" />}
-          {!selectedMood && <div className="watermark-bg">MoodyBeats</div>}
-          {!selectedMood && <>
-            <span className="floating-note" style={{top: '18%', left: '12%'}}>🎵</span>
-            <span className="floating-note" style={{top: '70%', left: '80%'}}>🎼</span>
-            <span className="floating-note" style={{top: '40%', left: '60%'}}></span>
-            <span className="floating-note" style={{top: '60%', left: '25%'}}>🎷</span>
-          </>}
+          {/* Solid background for home page when no mood is selected */}
           {selectedSongDetails ? (
             <>
               {/* MOBILE SONG DETAIL MODAL (only visible on mobile) */}
@@ -3678,38 +3696,108 @@ export default function Home() {
                       </div>
                     ))
                   )}
-                  {createPlaylistWarning && (
+                {createPlaylistWarning && (
                     <div className="text-red-400 text-sm mt-2">{createPlaylistWarning}</div>
                   )}
                 </div>
-                {/* Create Playlist Modal for mobile (same as desktop, but always rendered globally) */}
-                {showCreateModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 md:hidden">
-                    <div className="bg-[#232323] rounded-lg p-6 w-full max-w-xs mx-4 relative">
-                      <div className="mb-4 text-white font-semibold text-lg">Create Playlist</div>
-                      {createPlaylistWarning && (
-                        <div className="mb-2 text-red-400 text-sm font-semibold">{createPlaylistWarning}</div>
-                      )}
-                      <input
-                        className="w-full px-3 py-2 rounded bg-[#181818] text-white border border-[#404040] mb-4 focus:outline-none"
-                        placeholder="Playlist name"
-                        value={newPlaylistName}
-                        onChange={e => setNewPlaylistName(e.target.value)}
-                        onKeyDown={e => { if (e.key === 'Enter') handleCreatePlaylist(); }}
-                        autoFocus
-                        disabled={isCreatingPlaylist}
-                      />
-                      <div className="flex justify-end gap-2">
-                        <button onClick={() => setShowCreateModal(false)} className="px-4 py-1 rounded bg-gray-600 text-white" disabled={isCreatingPlaylist}>Cancel</button>
-                        <button onClick={handleCreatePlaylist} className="px-4 py-1 rounded bg-blue-500 text-white font-semibold" disabled={isCreatingPlaylist}>{isCreatingPlaylist ? 'Creating...' : 'Create'}</button>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
             </main>
           ) : currentPage === 'faq' ? (
             <FAQPage />
+          ) : currentPage === 'premium' ? (
+            <main className="min-h-screen relative overflow-hidden mb-[100px] md:mb-0">
+              <div className="relative z-10 max-w-4xl mx-auto px-4 py-8 md:py-12">
+                {/* Premium Status Header */}
+                <div className="text-center mb-12">
+                  <div className="flex items-center justify-center mb-6">
+                    <div className={`w-24 h-24 rounded-full flex items-center justify-center mb-4 relative ${isPremium ? 'ring-4 ring-blue-400' : ''}`}
+                      style={{ background: isPremium ? 'linear-gradient(135deg, #2563eb 60%, #1e40af 100%)' : 'linear-gradient(135deg, #374151 60%, #232a34 100%)' }}>
+                      <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <polygon points="10,1 12.09,6.26 18,6.91 13.5,10.97 14.82,16.02 10,13.27 5.18,16.02 6.5,10.97 2,6.91 7.91,6.26" />
+                      </svg>
+                      {isPremium && (
+                        <span className="absolute left-1/2 -translate-x-1/2 bottom-0 translate-y-1/2 bg-blue-600 text-white rounded-full px-3 py-1 text-xs font-bold shadow-lg border-2 border-white">★ Premium</span>
+                      )}
+                    </div>
+                  </div>
+                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                    {isPremium ? 'You\'re a Premium Member!' : 'Premium Membership'}
+                  </h1>
+                  <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+                    {isPremium 
+                      ? `Your premium subscription is active${premiumUntil ? ` until ${new Date(premiumUntil).toLocaleDateString()}` : ''}. Enjoy unlimited access to all premium features!`
+                      : 'Upgrade to unlock unlimited features and enhance your music experience.'}
+                  </p>
+                </div>
+
+                {/* Premium Features List */}
+                <div className="bg-[#232323] rounded-2xl p-8 mb-8 border border-gray-700">
+                  <h2 className="text-2xl font-bold text-white mb-6 text-center">Premium Features</h2>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    {[
+                      'Unlimited Smart Shuffle queue',
+                      'Unlimited songs per playlist',
+                      'Cross-device sync',
+                      'Advanced Smart Shuffle algorithm',
+                      'Premium badge & themes',
+                      'High-quality audio streaming',
+                      'Offline listening',
+                      'Custom playlist covers',
+                      'Early access to new features',
+                      'Priority support',
+                      'Ad-free experience',
+                      'Exclusive moods & playlists',
+                      'More skips per hour',
+                      'Custom mood creation',
+                      'Personalized recommendations',
+                      'Premium-only UI themes',
+                    ].map((feature, index) => (
+                      <div key={index} className="flex items-center gap-3 text-gray-300">
+                        <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        <span>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                  {isPremium ? (
+                    <>
+                      <button
+                        onClick={cancelPremium}
+                        className="px-8 py-4 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-semibold text-lg shadow-lg"
+                      >
+                        Cancel Subscription
+                      </button>
+                      <button
+                        onClick={() => setCurrentPage('home')}
+                        className="px-8 py-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold text-lg"
+                      >
+                        Back to Home
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => setShowPremiumModal(true)}
+                        className="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-800 text-white rounded-lg hover:from-blue-600 hover:to-blue-900 transition-colors font-semibold text-lg shadow-lg"
+                      >
+                        ★ Upgrade to Premium
+                      </button>
+                      <button
+                        onClick={() => setCurrentPage('home')}
+                        className="px-8 py-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold text-lg"
+                      >
+                        Back to Home
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </main>
           ) : (
             <main>
               {/* Hero Section */}
@@ -4204,7 +4292,7 @@ export default function Home() {
                       </ul>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-4">Connect</h4>
+                      {/*<h4 className="font-semibold mb-4">Connect</h4>
                       <div className="flex space-x-4">
                         <a href="#" className="w-10 h-10 bg-[#282828] rounded-full flex items-center justify-center hover:bg-[#333333] transition-colors border border-[#404040]">
                           📘
@@ -4218,7 +4306,7 @@ export default function Home() {
                         <a href="#" className="w-10 h-10 bg-[#282828] rounded-full flex items-center justify-center hover:bg-[#333333] transition-colors border border-[#404040]">
                           📺
                         </a>
-                      </div>
+                      </div>*/}
                     </div>
                   </div>
                   <div className="border-t border-[#404040] mt-8 pt-8 text-center text-sm text-gray-400">
@@ -4485,14 +4573,23 @@ export default function Home() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-end w-full sm:w-auto">
-                {/* On desktop, show upgrade beside Start Smart Shuffle. On mobile, move to bottom left (see below) */}
-                {!isPremium && user && (
-                  <button
-                    onClick={() => setShowPremiumModal(true)}
-                    className="hidden sm:inline-block px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-800 text-white rounded-lg hover:from-blue-600 hover:to-blue-900 transition-colors text-xs sm:text-sm font-semibold ml-2"
-                  >
-                    ★ Upgrade to Premium
-                  </button>
+                {/* On desktop, show upgrade or cancel beside Start Smart Shuffle. On mobile, move upgrade to bottom left (see below) */}
+                {user && (
+                  isPremium ? (
+                    <button
+                      onClick={cancelPremium}
+                      className="hidden sm:inline-block px-3 py-2 sm:px-4 sm:py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs sm:text-sm font-semibold ml-2"
+                    >
+                      Cancel subscription
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => setShowPremiumModal(true)}
+                      className="hidden sm:inline-block px-3 py-2 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-500 to-blue-800 text-white rounded-lg hover:from-blue-600 hover:to-blue-900 transition-colors text-xs sm:text-sm font-semibold ml-2"
+                    >
+                      ★ Upgrade to Premium
+                    </button>
+                  )
                 )}
                 <button
                   onClick={() => {
@@ -4546,6 +4643,12 @@ export default function Home() {
           onClose={() => setShowPremiumModal(false)}
           onUpgrade={upgradeToPremium}
           isPremium={isPremium}
+          isLoggedIn={!!user}
+          onRequireLogin={() => {
+            setIsLoginMode(true);
+            setShowAuthModal(true);
+          }}
+          onCancel={cancelPremium}
           features={[
             'Unlimited Smart Shuffle queue',
             'Unlimited songs per playlist',
@@ -4896,6 +4999,31 @@ export default function Home() {
            </div>
         </div>
       )}
+      {/* Global Create Playlist Modal for mobile (works from any page) */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 md:hidden">
+          <div className="bg-[#232323] rounded-lg p-6 w-full max-w-xs mx-4 relative">
+            <div className="mb-4 text-white font-semibold text-lg">Create Playlist</div>
+            {createPlaylistWarning && (
+              <div className="mb-2 text-red-400 text-sm font-semibold">{createPlaylistWarning}</div>
+            )}
+            <input
+              className="w-full px-3 py-2 rounded bg-[#181818] text-white border border-[#404040] mb-4 focus:outline-none"
+              placeholder="Playlist name"
+              value={newPlaylistName}
+              onChange={e => setNewPlaylistName(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleCreatePlaylist(); }}
+              autoFocus
+              disabled={isCreatingPlaylist}
+            />
+            <div className="flex justify-end gap-2">
+              <button onClick={() => setShowCreateModal(false)} className="px-4 py-1 rounded bg-gray-600 text-white" disabled={isCreatingPlaylist}>Cancel</button>
+              <button onClick={handleCreatePlaylist} className="px-4 py-1 rounded bg-blue-500 text-white font-semibold" disabled={isCreatingPlaylist}>{isCreatingPlaylist ? 'Creating...' : 'Create'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Library Bottom Sheet/Modal */}
       {showMobileLibrary && (
         <div className="md:hidden fixed inset-0 z-50 flex items-end justify-center bg-black bg-opacity-40" onClick={e => { if (e.target === e.currentTarget) setShowMobileLibrary(false); }}>
@@ -5047,7 +5175,13 @@ export default function Home() {
         {/* Premium */}
         <button
           className={`flex flex-col items-center justify-center focus:outline-none bg-transparent border-none rounded-none shadow-none p-0 m-0 ${currentPage === 'premium' ? 'text-blue-400' : 'text-white'}`}
-          onClick={() => setShowPremiumModal(true)}
+          onClick={() => {
+            if (isPremium) {
+              setCurrentPage('premium');
+            } else {
+              setShowPremiumModal(true);
+            }
+          }}
           type="button"
         >
           {/* MoodyBeats logo icon: white circle with black M */}

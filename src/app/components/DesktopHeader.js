@@ -180,14 +180,24 @@ export default function DesktopHeader({
                 )}
               </div>
             </nav>
-            {user && !isPremium && (
-              <button
-                onClick={() => setShowPremiumModal(true)}
-                className="ml-2 px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-800 text-white rounded-full hover:from-blue-600 hover:to-blue-900 transition-colors font-semibold shadow border border-blue-600 text-sm"
-                style={{ fontSize: '0.95rem', minHeight: 0, minWidth: 0 }}
-              >
-                ★ Go Premium
-              </button>
+            {user && (
+              isPremium ? (
+                <button
+                  onClick={() => setCurrentPage('premium')}
+                  className="ml-2 px-3 py-1 bg-green-600 text-white rounded-full hover:bg-green-700 transition-colors font-semibold shadow border border-green-500 text-sm"
+                  style={{ fontSize: '0.95rem', minHeight: 0, minWidth: 0 }}
+                >
+                  Upgraded
+                </button>
+              ) : (
+                <button
+                  onClick={() => setShowPremiumModal(true)}
+                  className="ml-2 px-3 py-1 bg-gradient-to-r from-blue-500 to-blue-800 text-white rounded-full hover:from-blue-600 hover:to-blue-900 transition-colors font-semibold shadow border border-blue-600 text-sm"
+                  style={{ fontSize: '0.95rem', minHeight: 0, minWidth: 0 }}
+                >
+                  ★ Go Premium
+                </button>
+              )
             )}
             {user ? (
               <div className="relative flex items-center">
