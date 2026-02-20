@@ -2351,7 +2351,7 @@ export default function Home() {
     setContactError('');
     setContactSuccess('');
     try {
-      const res = await fetch('https://mood-backend-yb8i.onrender.com/api/contact', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(contactForm),
@@ -4641,20 +4641,7 @@ export default function Home() {
           features={[
             'Unlimited Smart Shuffle queue',
             'Unlimited songs per playlist',
-            'Cross-device sync',
-            'Advanced Smart Shuffle algorithm',
             'Premium badge & themes',
-            'High-quality audio streaming',
-            'Offline listening',
-            'Custom playlist covers',
-            'Early access to new features',
-            'Priority support',
-            'Ad-free experience',
-            'Exclusive moods & playlists',
-            'More skips per hour',
-            'Custom mood creation',
-            'Personalized recommendations',
-            'Premium-only UI themes',
           ]}
         />,
         document.body
