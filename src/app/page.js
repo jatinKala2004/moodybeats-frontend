@@ -3543,7 +3543,7 @@ export default function Home() {
                 </div>
               </div>
             </main>
-          ) : currentPage === 'contact' ? (
+          ) : currentPage === 'contact' ? (//******************* contact us ***************************
             <main>
               <div className="flex flex-col items-center justify-center h-full rounded-lg p-8 text-white w-full max-w-xl mx-auto mb-[100px] md:mb-0" style={{background: '#232323', opacity: 1, position: 'relative', zIndex: 1}}>
                 <h2 className="text-4xl font-extrabold text-white mb-4">Contact Us</h2>
@@ -3737,20 +3737,7 @@ export default function Home() {
                     {[
                       'Unlimited Smart Shuffle queue',
                       'Unlimited songs per playlist',
-                      'Cross-device sync',
-                      'Advanced Smart Shuffle algorithm',
                       'Premium badge & themes',
-                      'High-quality audio streaming',
-                      'Offline listening',
-                      'Custom playlist covers',
-                      'Early access to new features',
-                      'Priority support',
-                      'Ad-free experience',
-                      'Exclusive moods & playlists',
-                      'More skips per hour',
-                      'Custom mood creation',
-                      'Personalized recommendations',
-                      'Premium-only UI themes',
                     ].map((feature, index) => (
                       <div key={index} className="flex items-center gap-3 text-gray-300">
                         <svg className="w-5 h-5 text-green-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -3772,12 +3759,12 @@ export default function Home() {
                       >
                         Cancel Subscription
                       </button>
-                      <button
+                      {/*<button
                         onClick={() => setCurrentPage('home')}
                         className="px-8 py-4 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors font-semibold text-lg"
                       >
                         Back to Home
-                      </button>
+                      </button>*/}
                     </>
                   ) : (
                     <>
@@ -4310,7 +4297,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="border-t border-[#404040] mt-8 pt-8 text-center text-sm text-gray-400">
-                    <p>&copy; 2024 MoodyBeats. All rights reserved. Made with ❤️ for music lovers.</p>
+                    <p>&copy; 2024 MoodyBeats. All rights reserved.</p>
                   </div>
                 </div>
               </footer>
@@ -4612,13 +4599,15 @@ export default function Home() {
                     }
                   }}
                   className={`px-4 py-2 sm:px-6 sm:py-2 rounded-full transition-colors font-medium text-xs sm:text-base ${
-                    smartShuffleQueue.length > 0
-                      ? 'bg-green-500 hover:bg-green-600 text-white'
-                      : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    smartShuffleQueue.length === 0
+                      ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                      : smartShuffleMode
+                      ? 'bg-red-500 hover:bg-red-600 text-white'
+                      : 'bg-green-500 hover:bg-green-600 text-white'
                   }`}
                   disabled={smartShuffleQueue.length === 0}
                 >
-                  Start Smart Shuffle
+                  {smartShuffleMode ? 'Stop Smart Shuffle' : 'Start Smart Shuffle'}
                 </button>
               </div>
               {/* Mobile: Upgrade button fixed at bottom left */}
